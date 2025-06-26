@@ -29,10 +29,18 @@ jobs:
         run: |
           pyinstaller --onefile real_time_emission_parser.py --name RealTimeEmissionParser
 
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ github.ref_name }}
+          name: RealTimeEmissionParser
+          generateReleaseNotes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Upload EXE to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: RealTimeEmissionParser
           tag_name: ${{ github.ref_name }}
           files: dist/RealTimeEmissionParser.exe
         env:

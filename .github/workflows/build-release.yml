@@ -3,10 +3,7 @@ name: Build and Release EXE
 on:
   push:
     tags:
-      - 'v*'  # Trigger on tag pushes like v1.0.0
-
-permissions:
-  contents: write  # Required for release creation and uploading assets
+      - 'v*'  # Triggers on tags like v1.0.0, v2.3.1, etc.
 
 jobs:
   build-and-release:

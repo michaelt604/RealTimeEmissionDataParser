@@ -3,9 +3,10 @@ name: Build and Release EXE
 on:
   push:
     tags:
-      - 'v*'
-    branches:
-      - main
+      - 'v*'  # Trigger on tag pushes like v1.0.0
+
+permissions:
+  contents: write  # Required for release creation and uploading assets
 
 jobs:
   build-and-release:
@@ -30,12 +31,8 @@ jobs:
         run: |
           pyinstaller --onefile real_time_emission_parser.py --name RealTimeEmissionParser
 
-      - name: List dist folder contents
-        run: dir dist
-
       - name: Upload EXE to GitHub Release
         uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
         with:
           name: RealTimeEmissionParser
           tag_name: ${{ github.ref_name }}

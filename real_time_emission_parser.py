@@ -1,6 +1,9 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 import datetime
@@ -12,6 +15,8 @@ import math
 import logging
 import traceback
 import unicodedata
+import signal
+import sys
 
 URL = "https://www.ineossarnia.com/real-time-emission-data"
 OUTPUT_CSV = "air_quality_log.csv"
@@ -19,6 +24,10 @@ ERROR_LOG = "scraper_error.log"
 
 # Setup logging for errors
 logging.basicConfig(filename=ERROR_LOG, level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(message)s')
+
+def signal_handler(sig, frame):
+    print("\n[INFO] Exiting gracefully.")
+    sys.exit(0)
     
 def fetch_rendered_html():
     options = Options()
@@ -31,8 +40,10 @@ def fetch_rendered_html():
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
     try:
-        driver.get(URL)
-        time.sleep(5)  # Wait for JS to load
+        driver.get(URL) 
+        WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, '.c-table-container table'))
+        )   #Smart selenium wait for the table to load
         html = driver.page_source
     finally:
         driver.quit()
@@ -139,3 +150,5 @@ def safe_run_forever():
 
 if __name__ == "__main__":
     safe_run_forever()
+
+signal.signal(signal.SIGINT, signal_handler)
